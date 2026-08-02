@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #0d1b2a;
+  --color-secondary: #1b263b;
+  --color-accent: #d4af37;
+  --color-gray: #6c757d;
+  --color-bg-light: #f5f7fa;
+
+  --bg-app: var(--color-bg-light);
+  --bg-surface: #ffffff;
+  --text-main: var(--color-primary);
+  --text-muted: var(--color-gray);
+  --border-soft: #e6e9ee;
+}
+
+.v-theme--dark {
+  --bg-app: #0d1b2a;
+  --bg-surface: #1b263b;
+  --text-main: #ffffff;
+  --text-muted: #a8b2c1;
+  --border-soft: #28344a;
+}
+
+* {
+  font-family: 'Cairo', sans-serif;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+   font-family: 'Cairo', sans-serif !important  ; 
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray);
+  border-radius: 8px;
+  opacity: 0.5;
+}
+
+.page-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Reusable card style — clean, rounded, soft shadow */
+.app-card {
+  background-color: var(--bg-surface);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px 0 rgba(13, 27, 42, 0.08);
+  border: 1px solid var(--border-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-card:hover {
+  box-shadow: 0 10px 40px 0 rgba(13, 27, 42, 0.12);
+}
+
+.text-gold {
+  color: var(--color-accent) !important;
+}
+
+.bg-gold {
+  background-color: var(--color-accent) !important;
+}
