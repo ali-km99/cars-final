@@ -40,9 +40,14 @@ const headers = [
 <template>
   <div>
     <div class="md:flex align-center justify-space-between mb-6">
-      <div class="flex flex-column py-4">
-        <span class="font-weight-bold text-2xl">العملاء</span>
-        <span class="text-sm text-medium-emphasis">قائمة عملاء المعرض</span>
+      <div>
+        <div class="d-flex align-center ga-3 mb-1">
+          <v-avatar color="accent" rounded="lg" size="40">
+            <v-icon icon="mdi-account-group-outline" color="white" size="22" />
+          </v-avatar>
+          <span class="text-2xl font-bold"> العملاء </span>
+        </div>
+        <span class="text-sm text-medium-emphasis"> قائمة عملاء المعرض </span>
       </div>
       <v-btn
         color="accent"

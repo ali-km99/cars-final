@@ -10,6 +10,7 @@ import transactionsRoutes from "@/features/transactions/routes";
 import authRoutes from "@/features/auth/routes";
 import usersRoutes from "@/features/users/routes";
 import sharingRoutes from "@/features/public/routes";
+import expensesRoutes from "@/features/expenses/routes";
 
 const routes: RouteRecordRaw[] = [
   ...dashboardRoutes,
@@ -18,6 +19,7 @@ const routes: RouteRecordRaw[] = [
   ...salesRoutes,
   ...maintenancesRoutes,
   ...transactionsRoutes,
+  ...expensesRoutes,
   ...usersRoutes,
   ...authRoutes,
   ...sharingRoutes,
