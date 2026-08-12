@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { shareService } from "../services/share.service";
-import type { ShareAnalytics } from "../models/share.model";
+import QrcodeVue from "qrcode.vue";
+import { shareService } from "../../public/services/share.service";
+import type { ShareAnalytics } from "../../public/models/share.model";
 
 const props = defineProps<{ carId: number }>();
 const baseUrl = window.location.origin;
 const loading = ref(true);
 const notFound = ref(false);
 const data = ref<ShareAnalytics | null>(null);
+
+// متغيرات الـ QR Code والطباعة
+const selectedQrUrl = ref<string | null>(null);
+const qrDialog = ref(false);
 
 // تغيير النوع ليكون string أو null
 const copiedLinkId = ref<string | null>(null);
@@ -16,7 +21,6 @@ async function copyUrl(token: string, shareId: string | number) {
   const fullUrl = `${baseUrl}/public/car/${token}`;
   await navigator.clipboard.writeText(fullUrl);
 
-  // تحويل الـ id دائماً إلى string لتفادي اختلاف الأنواع
   const idStr = String(shareId);
   copiedLinkId.value = idStr;
 
@@ -25,6 +29,86 @@ async function copyUrl(token: string, shareId: string | number) {
       copiedLinkId.value = null;
     }
   }, 2500);
+}
+
+// فتح نافذة الـ QR للروابط المتعددة
+function openQrDialog(token: string) {
+  selectedQrUrl.value = `${baseUrl}/public/car/${token}`;
+  qrDialog.value = true;
+}
+
+// دالة الطباعة الخاصة بـ QR Code
+function printQrCode(url: string) {
+  const canvas =
+    (document.querySelector("#qr-code-canvas canvas") as HTMLCanvasElement) ||
+    (document.querySelector("#single-qr-canvas canvas") as HTMLCanvasElement);
+
+  const qrImageSrc = canvas ? canvas.toDataURL("image/png") : "";
+
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) return;
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <title>طباعة QR Code</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .qr-card {
+          border: 2px solid #ddd;
+          padding: 24px;
+          border-radius: 12px;
+          text-align: center;
+          max-width: 300px;
+        }
+        img {
+          width: 200px;
+          height: 200px;
+        }
+        p {
+          word-break: break-all;
+          font-size: 12px;
+          color: #555;
+          margin-top: 12px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="qr-card">
+        <h3>رمز مشاركة السيارة</h3>
+        <img id="qr-img" src="${qrImageSrc}" alt="QR Code" />
+        <p>${url}</p>
+      </div>
+
+      <script>
+        const img = document.getElementById("qr-img");
+
+        if (img.complete) {
+          setTimeout(() => window.print(), 300);
+        } else {
+          img.onload = () => {
+            setTimeout(() => window.print(), 300);
+          };
+        }
+
+        window.onafterprint = () => {
+          window.close();
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
 }
 
 onMounted(async () => {
@@ -144,6 +228,7 @@ const chartOptions = computed(() => ({
                 {{ baseUrl }}/public/car/{{ link.token }}
               </span>
 
+              <!-- Copy Button -->
               <v-btn
                 :icon="
                   copiedLinkId === String(link.shareId)
@@ -153,9 +238,21 @@ const chartOptions = computed(() => ({
                 :color="
                   copiedLinkId === String(link.shareId) ? 'success' : undefined
                 "
-                size="x-small"
+                size="small"
                 variant="text"
+                title="نسخ الرابط"
                 @click="copyUrl(link.token, link.shareId)"
+              />
+
+              <!-- QR Dialog Button (فقط عند وجود أكثر من رابط) -->
+              <v-btn
+                v-if="data.links.length > 1"
+                icon="mdi-qrcode"
+                size="small"
+                variant="text"
+                color="accent"
+                title="عرض QR Code"
+                @click="openQrDialog(link.token)"
               />
             </v-list-item-title>
 
@@ -167,7 +264,74 @@ const chartOptions = computed(() => ({
             </template>
           </v-list-item>
         </v-list>
+
+        <!-- حالة وجود رابط واحد فقط: يظهر الـ QR مباشرة ومعه زر طباعة -->
+        <div
+          v-if="data.links.length === 1"
+          class="d-flex flex-column align-center justify-center mt-6 pt-4 border-t ga-3"
+        >
+          <div id="single-qr-canvas" class="bg-white pa-3 rounded-lg border">
+            <qrcode-vue
+              :value="`${baseUrl}/public/car/${data.links[0].token}`"
+              :size="150"
+              level="H"
+            />
+          </div>
+
+          <v-btn
+            color="accent"
+            variant="tonal"
+            size="small"
+            prepend-icon="mdi-printer"
+            @click="printQrCode(`${baseUrl}/public/car/${data.links[0].token}`)"
+          >
+            طباعة الـ QR Code
+          </v-btn>
+        </div>
       </div>
     </div>
   </v-card>
+
+  <!-- نافذة منبثقة للـ QR (في حالة الروابط المتعددة) -->
+  <v-dialog v-model="qrDialog" max-width="360">
+    <v-card dir="rtl" class="pa-5 text-center rounded-xl">
+      <div class="d-flex justify-space-between align-center mb-4">
+        <span class="font-weight-bold">رمز الـ QR للمشاركة</span>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          @click="qrDialog = false"
+        />
+      </div>
+
+      <div v-if="selectedQrUrl" class="d-flex flex-column align-center ga-4">
+        <div id="qr-code-canvas" class="bg-white pa-4 rounded-lg border">
+          <qrcode-vue :value="selectedQrUrl" :size="180" level="H" />
+        </div>
+
+        <span
+          dir="ltr"
+          class="text-caption text-medium-emphasis text-truncate style-url"
+        >
+          {{ selectedQrUrl }}
+        </span>
+
+        <v-btn
+          block
+          color="accent"
+          prepend-icon="mdi-printer"
+          @click="printQrCode(selectedQrUrl)"
+        >
+          طباعة الـ QR Code
+        </v-btn>
+      </div>
+    </v-card>
+  </v-dialog>
 </template>
+
+<style scoped>
+.style-url {
+  max-width: 100%;
+}
+</style>

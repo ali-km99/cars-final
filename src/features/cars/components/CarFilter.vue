@@ -137,7 +137,7 @@ onMounted(async () => {
           v-model="filter.SearchTerm"
           label="بحث بالاسم أو الماركة"
           prepend-inner-icon="mdi-magnify"
-          variant="outlined"
+          variant="solo-inverted"
           density="comfortable"
           rounded="lg"
           hide-details
@@ -150,7 +150,7 @@ onMounted(async () => {
           :items="brands"
           label="الماركة"
           prepend-inner-icon="mdi-car-multiple"
-          variant="outlined"
+          variant="solo-inverted"
           density="comfortable"
           rounded="lg"
           hide-details
@@ -168,7 +168,7 @@ onMounted(async () => {
           item-value="value"
           label="حالة السيارة"
           prepend-inner-icon="mdi-list-status"
-          variant="outlined"
+          variant="solo-inverted"
           density="comfortable"
           rounded="lg"
           hide-details
@@ -182,7 +182,7 @@ onMounted(async () => {
           label="من سعر"
           type="number"
           prepend-inner-icon="mdi-cash"
-          variant="outlined"
+          variant="solo-inverted"
           density="comfortable"
           rounded="lg"
           hide-details
@@ -194,7 +194,7 @@ onMounted(async () => {
           label="إلى سعر"
           type="number"
           prepend-inner-icon="mdi-cash-multiple"
-          variant="outlined"
+          variant="solo-inverted"
           density="comfortable"
           rounded="lg"
           hide-details
@@ -206,7 +206,7 @@ onMounted(async () => {
           label="من سنة"
           type="number"
           prepend-inner-icon="mdi-calendar-start"
-          variant="outlined"
+          variant="solo-inverted"
           density="comfortable"
           rounded="lg"
           hide-details
@@ -218,7 +218,7 @@ onMounted(async () => {
           label="إلى سنة"
           type="number"
           prepend-inner-icon="mdi-calendar-end"
-          variant="outlined"
+          variant="solo-inverted"
           density="comfortable"
           rounded="lg"
           hide-details
@@ -234,7 +234,7 @@ onMounted(async () => {
             :items="['سيدان', 'SUV', 'هاتشباك', 'كوبيه', 'بيك أب']"
             label="نوع الهيكل"
             prepend-inner-icon="mdi-car-sports"
-            variant="outlined"
+            variant="solo-inverted"
             density="comfortable"
             rounded="lg"
             hide-details
@@ -250,7 +250,7 @@ onMounted(async () => {
             item-value="value"
             label="ناقل الحركة"
             prepend-inner-icon="mdi-car-shift-pattern"
-            variant="outlined"
+            variant="solo-inverted"
             density="comfortable"
             rounded="lg"
             hide-details
@@ -266,7 +266,7 @@ onMounted(async () => {
             item-value="value"
             label="حالة الاستخدام"
             prepend-inner-icon="mdi-star-check-outline"
-            variant="outlined"
+            variant="solo-inverted"
             density="comfortable"
             rounded="lg"
             hide-details
@@ -282,7 +282,7 @@ onMounted(async () => {
             item-value="value"
             label="نوع الوقود"
             prepend-inner-icon="mdi-gas-station"
-            variant="outlined"
+            variant="solo-inverted"
             density="comfortable"
             rounded="lg"
             hide-details
@@ -298,7 +298,7 @@ onMounted(async () => {
             item-value="value"
             label="المواصفات / الاستيراد"
             prepend-inner-icon="mdi-earth"
-            variant="outlined"
+            variant="solo-inverted"
             density="comfortable"
             rounded="lg"
             hide-details

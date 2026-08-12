@@ -11,10 +11,11 @@ import {
   resolveImageUrl,
 } from "@/core/utils/formatters";
 import CarImagesModal from "../components/CarImagesModal.vue";
-import Sharelinkmodal from "@/features/public/components/ShareLinkModal.vue";
-import Shareanalyticscard from "@/features/public/components/ShareAnalyticsCard.vue";
+
 import { useUiStore } from "@/core/store/ui.store.ts";
 
+import ShareLinkModal from "../components/ShareLinkModal.vue";
+import ShareAnalyticsCard from "../components/ShareAnalyticsCard.vue";
 const route = useRoute();
 const router = useRouter();
 const carStore = useCarStore();
@@ -162,7 +163,7 @@ const copyVin = async () => {
               {{ statusMeta.label }}
             </v-chip>
           </div>
-          <div class="flex justify-between">
+          <div class="flex justify-between items-center">
             <p
               class="text-sm text-gray dark:text-gray/80 font-medium mt-1 mx-2"
             >
@@ -270,7 +271,9 @@ const copyVin = async () => {
               }}</span>
             </div>
             <div class="text-left" v-if="profit">
-              <span class="text-xs text-primary block mb-1">الربح المتوقع</span>
+              <span class="text-xs text-green-400 block mb-1"
+                >الربح المتوقع</span
+              >
               <span
                 :class="profit >= 0 ? 'text-green-400' : 'text-red-400'"
                 class="text-lg font-bold"
@@ -597,7 +600,7 @@ const copyVin = async () => {
           </div>
         </div>
 
-        <Shareanalyticscard :carId="carId" />
+        <ShareAnalyticsCard :carId="carId" />
 
         <v-card
           class="rounded-xl2 overflow-hidden bg-primary-light border-2 border-accent shadow-gold text-white"
@@ -811,7 +814,7 @@ const copyVin = async () => {
       @deleteImage="handleDeleteImage"
     />
 
-    <Sharelinkmodal v-model="showShareModal" :carId="carId" />
+    <ShareLinkModal v-model="showShareModal" :carId="carId" />
   </div>
 </template>
 

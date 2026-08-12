@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { shareService } from "../services/share.service";
+import { shareService } from "../../public/services/share.service";
 import { useUiStore } from "@/core/store/ui.store";
-import type { ContactEntry } from "../models/share.model";
+import type { ContactEntry } from "../../public/models/share.model";
 import AppModal from "@/shared/components/AppModal.vue";
 
 const props = defineProps<{ carId: number }>();

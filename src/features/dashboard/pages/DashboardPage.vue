@@ -62,6 +62,9 @@ const donutOptions = computed(() => ({
   },
   plotOptions: {
     pie: {
+      borderRadius: 12,
+      spacing: 5,
+
       donut: {
         size: "68%",
         labels: {
@@ -78,7 +81,7 @@ const donutOptions = computed(() => ({
       },
     },
   },
-  stroke: { width: 2, colors: [isDark.value ? "#1B263B" : "#fff"] },
+  // stroke: { width: 2, colors: [isDark.value ? "#1B263B" : "#fff"] },
   tooltip: {
     style: { fontFamily: "Cairo, sans-serif" },
     y: { formatter: (v: number) => `${v} سيارة` },
@@ -212,6 +215,11 @@ const financialCards = computed(() => [
 // ─────────────────────────────────────────────────────────────
 // Fleet status cards
 // ─────────────────────────────────────────────────────────────
+
+// ========================================
+// Fleet Cards
+// ========================================
+
 const fleetCards = computed(() => [
   {
     label: "جاهزة للبيع",
@@ -221,6 +229,7 @@ const fleetCards = computed(() => [
     bgClass: "fleet-ready",
     tooltip: "السيارات المتاحة وجاهزة للبيع فوراً",
   },
+
   {
     label: "مباعة",
     value: stats.value.soldCars,
@@ -229,6 +238,7 @@ const fleetCards = computed(() => [
     bgClass: "fleet-sold",
     tooltip: "إجمالي السيارات التي تم بيعها",
   },
+
   {
     label: "في الصيانة",
     value: stats.value.inMaintenanceCars,
@@ -237,6 +247,16 @@ const fleetCards = computed(() => [
     bgClass: "fleet-maintenance",
     tooltip: "السيارات التي تخضع حالياً للصيانة",
   },
+
+  {
+    label: "قيد الشحن",
+    value: stats.value.inShipping,
+    icon: "mdi-truck-fast",
+    color: "info",
+    bgClass: "fleet-info",
+    tooltip: "السيارات الموجودة حالياً في مرحلة الشحن",
+  },
+
   {
     label: "إجمالي الأسطول",
     value: stats.value.totalCars,
@@ -246,6 +266,130 @@ const fleetCards = computed(() => [
     tooltip: "العدد الإجمالي لجميع السيارات في المعرض",
   },
 ]);
+
+// ========================================
+// إخفاء كرت إجمالي الأسطول
+// ========================================
+
+const fleetCardsWithoutTotal = computed(() => {
+  return fleetCards.value.filter((card) => card.label !== "إجمالي الأسطول");
+});
+
+// ========================================
+// إجمالي السيارات المستخدمة في Progress
+//
+// لا يشمل السيارات المباعة
+//
+// availableCars
+// + inMaintenanceCars
+// + inShipping
+// ========================================
+
+const availableFleetTotal = computed(() => {
+  return (
+    stats.value.availableCars +
+    stats.value.inMaintenanceCars +
+    stats.value.inShipping
+  );
+});
+
+// ========================================
+// بيانات الـ Progress Bar
+// ========================================
+
+const fleetProgress = computed(() => {
+  const total = availableFleetTotal.value;
+
+  // إذا لم توجد سيارات
+  if (total <= 0) {
+    return [
+      {
+        label: "جاهزة للبيع",
+        value: 0,
+        percent: 0,
+        rawPercent: 0,
+        color: "#2E7D32",
+      },
+
+      {
+        label: "صيانة",
+        value: 0,
+        percent: 0,
+        rawPercent: 0,
+        color: "#ED6C02",
+      },
+
+      {
+        label: "قيد الشحن",
+        value: 0,
+        percent: 0,
+        rawPercent: 0,
+        color: "#0287D1",
+      },
+    ];
+  }
+
+  const available = stats.value.availableCars;
+  const maintenance = stats.value.inMaintenanceCars;
+  const shipping = stats.value.inShipping;
+
+  return [
+    {
+      label: "جاهزة للبيع",
+      value: available,
+
+      // النسبة التي تظهر للمستخدم
+      percent: Math.round((available / total) * 100),
+
+      // النسبة الدقيقة للـ Progress
+      rawPercent: (available / total) * 100,
+
+      color: "#2E7D32",
+    },
+
+    {
+      label: "صيانة",
+      value: maintenance,
+
+      percent: Math.round((maintenance / total) * 100),
+
+      rawPercent: (maintenance / total) * 100,
+
+      color: "#ED6C02",
+    },
+
+    {
+      label: "قيد الشحن",
+      value: shipping,
+
+      percent: Math.round((shipping / total) * 100),
+
+      rawPercent: (shipping / total) * 100,
+
+      color: "#0287D1",
+    },
+  ];
+});
+
+// ========================================
+// الأقسام التي تحتوي على سيارات فقط
+//
+// مثال:
+//
+// جاهزة للبيع = 5
+// صيانة = 0
+// شحن = 2
+//
+// النتيجة:
+//
+// أخضر | أزرق
+//
+// بدون ظهور جزء للصيانة
+// ========================================
+
+const visibleFleetProgress = computed(() => {
+  return fleetProgress.value.filter((item) => item.value > 0);
+});
 
 // ─────────────────────────────────────────────────────────────
 // Quick actions definition
@@ -450,13 +594,19 @@ const profitClass = computed(() =>
         </v-col>
       </v-row>
 
-      <!-- ══════════════════════════════════════════════════
-           Section 2 — Fleet Status
-      ═══════════════════════════════════════════════════ -->
+      <!-- =========================================
+     عنوان قسم الأسطول
+========================================= -->
+
       <div class="d-flex align-center ga-2 mb-4 mt-6">
         <v-icon icon="mdi-car-multiple" color="accent" />
-        <span class="text-base font-bold text-nowrap">حالة أسطول السيارات</span>
+
+        <span class="text-base font-bold text-nowrap">
+          حالة أسطول السيارات
+        </span>
+
         <v-divider class="flex-grow-1 ms-2" />
+
         <v-btn
           variant="text"
           color="accent"
@@ -469,49 +619,173 @@ const profitClass = computed(() =>
         </v-btn>
       </div>
 
-      <v-row class="mb-2">
+      <!-- =========================================
+     كروت حالة السيارات
+========================================= -->
+
+      <v-row class="mb-4 fleet-cards-row">
         <v-col
-          v-for="(card, i) in fleetCards"
+          v-for="(card, i) in fleetCardsWithoutTotal"
           :key="card.label"
-          cols="6"
+          cols="12"
           sm="6"
           md="3"
         >
           <v-card
             v-motion
-            :initial="{ opacity: 0, scale: 0.94 }"
+            :initial="{
+              opacity: 0,
+              scale: 0.94,
+            }"
             :enter="{
               opacity: 1,
               scale: 1,
-              transition: { duration: 400, delay: 200 + i * 70 },
+              transition: {
+                duration: 400,
+                delay: 200 + i * 70,
+              },
             }"
             class="app-card pa-5 h-100 fleet-card"
             :class="card.bgClass"
+            rounded="xl"
           >
-            <v-tooltip :text="card.tooltip" location="top">
-              <template #activator="{ props: tip }">
-                <div
-                  v-bind="tip"
-                  class="d-flex flex-column align-center text-center ga-2"
-                >
-                  <v-avatar
-                    :color="card.color"
-                    variant="tonal"
-                    size="52"
-                    rounded="xl"
-                  >
-                    <v-icon :icon="card.icon" :color="card.color" size="26" />
-                  </v-avatar>
-                  <span class="text-h4 font-weight-bold">{{ card.value }}</span>
-                  <span class="text-body-2 text-medium-emphasis font-cairo">{{
-                    card.label
-                  }}</span>
-                </div>
-              </template>
-            </v-tooltip>
+            <div class="fleet-card-content">
+              <!-- Icon -->
+              <v-avatar
+                :color="card.color"
+                variant="tonal"
+                size="52"
+                rounded="xl"
+              >
+                <v-icon :icon="card.icon" :color="card.color" size="26" />
+              </v-avatar>
+
+              <!-- Data -->
+              <div class="fleet-card-info">
+                <span class="fleet-card-value">
+                  {{ card.value }}
+                </span>
+
+                <span class="fleet-card-label font-cairo">
+                  {{ card.label }}
+                </span>
+              </div>
+            </div>
           </v-card>
         </v-col>
       </v-row>
+
+      <!-- =========================================
+     إجمالي الأسطول + Progress Bar
+========================================= -->
+
+      <v-card class="pa-5 app-card fleet-total-card" rounded="xl">
+        <!-- Header -->
+        <div class="fleet-total-header">
+          <div>
+            <div class="text-body-2 text-medium-emphasis font-cairo">
+              إجمالي السيارات المتوفرة
+            </div>
+
+            <div class="fleet-total-number">
+              {{ availableFleetTotal }}
+            </div>
+          </div>
+
+          <v-avatar color="primary" variant="tonal" size="52" rounded="xl">
+            <v-icon icon="mdi-car-multiple" size="26" />
+          </v-avatar>
+        </div>
+
+        <!-- =====================================
+       Progress Bar
+  ====================================== -->
+
+        <div class="fleet-progress-container">
+          <!-- يوجد سيارات -->
+          <div
+            v-if="visibleFleetProgress.length"
+            class="fleet-progress"
+            dir="ltr"
+          >
+            <v-tooltip
+              v-for="(item, index) in visibleFleetProgress"
+              :key="item.label"
+              location="top"
+              :open-delay="80"
+              transition="scale-transition"
+            >
+              <template #activator="{ props }">
+                <div
+                  v-bind="props"
+                  class="fleet-progress-segment"
+                  :class="{
+                    'fleet-progress-first': index === 0,
+                    'fleet-progress-last':
+                      index === visibleFleetProgress.length - 1,
+                  }"
+                  :style="{
+                    flexGrow: item.rawPercent,
+                    backgroundColor: item.color,
+                  }"
+                ></div>
+              </template>
+
+              <!-- Tooltip -->
+              <div class="fleet-tooltip">
+                <div class="fleet-tooltip-count">
+                  {{ item.value }}
+                </div>
+
+                <div class="fleet-tooltip-row">
+                  <span
+                    class="fleet-tooltip-dot"
+                    :style="{
+                      backgroundColor: item.color,
+                    }"
+                  ></span>
+
+                  <span class="fleet-tooltip-label">
+                    {{ item.label }}
+                  </span>
+
+                  <strong class="fleet-tooltip-percent">
+                    ({{ item.percent }}%)
+                  </strong>
+                </div>
+              </div>
+            </v-tooltip>
+          </div>
+
+          <!-- لا توجد سيارات -->
+          <div v-else class="fleet-progress-empty font-cairo">
+            لا توجد سيارات متوفرة حالياً
+          </div>
+        </div>
+
+        <!-- =====================================
+       Legend
+  ====================================== -->
+
+        <div v-if="visibleFleetProgress.length" class="fleet-legend">
+          <div
+            v-for="item in fleetProgress"
+            :key="item.label"
+            class="fleet-legend-item"
+          >
+            <span
+              class="fleet-legend-dot"
+              :style="{
+                backgroundColor: item.color,
+              }"
+            ></span>
+
+            <span class="fleet-legend-label font-cairo">
+              {{ item.label }}
+            </span>
+          </div>
+        </div>
+      </v-card>
 
       <!-- ══════════════════════════════════════════════════
            Section 3 — Charts Row (Donut + Bar)
@@ -748,12 +1022,320 @@ const profitClass = computed(() =>
 </template>
 
 <style scoped>
-/* Fleet cards subtle accent background */
+/* =========================================
+   Fleet Cards
+========================================= */
+
 .fleet-card {
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
 .fleet-card:hover {
   transform: translateY(-3px);
+}
+
+.fleet-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fleet-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fleet-card-value {
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.fleet-card-label {
+  font-size: 13px;
+  color: rgba(var(--v-theme-on-surface), 0.65);
+}
+
+/* =========================================
+   Fleet Total Header
+========================================= */
+
+.fleet-total-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================================
+   Total Number
+========================================= */
+
+.fleet-total-number {
+  margin-top: 3px;
+
+  font-size: 30px;
+  line-height: 1;
+
+  font-weight: 900;
+}
+
+/* =========================================
+   Progress Container
+========================================= */
+
+.fleet-progress-container {
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* =========================================
+   Progress Bar
+========================================= */
+
+.fleet-progress {
+  width: 100%;
+  height: 48px;
+
+  display: flex;
+  align-items: stretch;
+
+  /*
+   * المسافة بين الأقسام
+   */
+  gap: 7px;
+
+  overflow: hidden;
+
+  min-width: 0;
+}
+
+/* =========================================
+   Progress Segment
+========================================= */
+
+.fleet-progress-segment {
+  min-width: 0;
+
+  height: 100%;
+
+  cursor: pointer;
+
+  /*
+   * مهم:
+   * لا يوجد border-radius هنا.
+   *
+   * حتى لا تظهر حواف دائرية
+   * بين كل جزء والجزء الآخر.
+   */
+
+  border-radius: 0;
+
+  flex-basis: 0;
+
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* =========================================
+   أول جزء
+========================================= */
+
+.fleet-progress-first {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+/* =========================================
+   آخر جزء
+========================================= */
+
+.fleet-progress-last {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* =========================================
+   Hover
+========================================= */
+
+.fleet-progress-segment:hover {
+  filter: brightness(1.08);
+
+  transform: scaleY(1.08);
+
+  z-index: 2;
+}
+
+/* =========================================
+   Tooltip
+========================================= */
+
+.fleet-tooltip {
+  min-width: 190px;
+
+  padding: 10px 13px;
+
+  direction: rtl;
+
+  text-align: right;
+
+  font-family: "Cairo", sans-serif;
+}
+
+.fleet-tooltip-count {
+  font-size: 18px;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  margin-bottom: 7px;
+}
+
+.fleet-tooltip-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  white-space: nowrap;
+
+  font-size: 13px;
+}
+
+.fleet-tooltip-dot {
+  width: 10px;
+  height: 10px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+.fleet-tooltip-label {
+  font-weight: 500;
+}
+
+.fleet-tooltip-percent {
+  font-weight: 800;
+}
+
+/* =========================================
+   Legend
+========================================= */
+
+.fleet-legend {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 18px;
+
+  margin-top: 12px;
+
+  font-family: "Cairo", sans-serif;
+}
+
+.fleet-legend-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+}
+
+.fleet-legend-dot {
+  width: 14px;
+  height: 14px;
+
+  flex-shrink: 0;
+}
+
+.fleet-legend-label {
+  font-size: 13px;
+
+  color: rgba(var(--v-theme-on-surface), 0.7);
+}
+
+/* =========================================
+   Empty State
+========================================= */
+
+.fleet-progress-empty {
+  width: 100%;
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: rgba(var(--v-theme-on-surface), 0.06);
+
+  color: rgba(var(--v-theme-on-surface), 0.55);
+
+  font-size: 13px;
+}
+
+/* =========================================
+   Mobile
+========================================= */
+
+@media (max-width: 600px) {
+  .fleet-card-content {
+    gap: 13px;
+  }
+
+  .fleet-card-value {
+    font-size: 25px;
+  }
+
+  .fleet-card-label {
+    font-size: 12px;
+  }
+
+  .fleet-progress {
+    height: 40px;
+
+    gap: 4px;
+  }
+
+  .fleet-progress-first {
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
+  }
+
+  .fleet-progress-last {
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
+  }
+
+  .fleet-total-number {
+    font-size: 27px;
+  }
+
+  .fleet-legend {
+    gap: 10px 14px;
+  }
+
+  .fleet-legend-item {
+    font-size: 12px;
+  }
+
+  .fleet-legend-dot {
+    width: 12px;
+    height: 12px;
+  }
 }
 
 .fleet-ready {
@@ -762,6 +1344,9 @@ const profitClass = computed(() =>
 .fleet-sold {
   border-right: 3px solid #d4af37 !important;
 }
+.fleet-info {
+  border-right: 3px solid #0287d1 !important;
+}
 .fleet-maintenance {
   border-right: 3px solid #ed6c02 !important;
 }
@@ -769,6 +1354,9 @@ const profitClass = computed(() =>
   border-right: 3px solid #0d1b2a !important;
 }
 
+.fleet-total-card .apexcharts-bar-area {
+  clip-path: inset(0 round 10px);
+}
 .sale-row {
   transition: background-color 0.15s ease;
 }
