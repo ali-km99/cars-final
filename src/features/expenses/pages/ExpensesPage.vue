@@ -166,7 +166,7 @@ const headers = [
     <v-card class="app-card pa-5 mb-5">
       <div class="d-flex align-center justify-space-between">
         <div>
-          <span class="text-caption text-medium-emphasis"
+          <span class="text-lg text-medium-emphasis"
             >إجمالي مصروفات الصفحة الحالية</span
           >
           <div class="text-h6 font-weight-bold text-error mt-1">

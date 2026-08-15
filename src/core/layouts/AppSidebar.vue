@@ -8,7 +8,7 @@ const navItems = [
   { title: "السيارات", icon: "mdi-car-multiple", to: "/cars" },
   { title: "العملاء", icon: "mdi-account-group-outline", to: "/customers" },
   { title: "المبيعات", icon: "mdi-cash-register", to: "/sales" },
-  { title: "الصيانة", icon: "mdi-wrench-outline", to: "/maintenances" },
+  { title: "الصيانة", icon: "mdi-car-cog", to: "/maintenances" },
   { title: "المصروفات", icon: "mdi-cash-minus", to: "/expenses" }, // 👈 جديد
   { title: "العمليات المالية", icon: "mdi-finance", to: "/transactions" },
   {

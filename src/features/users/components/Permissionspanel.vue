@@ -45,12 +45,14 @@ const groupedPermissions = computed(() => {
 
 const groupNames = computed(() => {
   const order = [
-    "Cars",
-    "Customers",
-    "Sales",
-    "Maintenance",
-    "Transactions",
     "Users",
+    "Dashboard",
+    "Cars",
+    "Transactions",
+    "Sales",
+    "Expenses",
+    "Maintenance",
+    "Customers",
   ];
 
   return order.filter((g) => groupedPermissions.value[g]);
@@ -63,6 +65,7 @@ const groupLabels: Record<string, string> = {
   Sales: "المبيعات",
   Maintenance: "الصيانة",
   Transactions: "العمليات المالية",
+  Expenses: "المصروفات",
   Users: "المستخدمون",
   Dashboard: "لوحة التحكم",
 };
@@ -71,6 +74,7 @@ const groupIcons: Record<string, string> = {
   Cars: "mdi-car-multiple",
   Customers: "mdi-account-group-outline",
   Sales: "mdi-cash-multiple",
+  Expenses: "mdi-cash-minus",
   Maintenances: "mdi-wrench-outline",
   Transactions: "mdi-finance",
   Users: "mdi-account-cog-outline",

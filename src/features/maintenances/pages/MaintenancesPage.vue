@@ -146,9 +146,14 @@ const headers = [
 <template>
   <div>
     <div class="d-flex align-center justify-space-between mb-6">
-      <div class="d-flex flex-column">
-        <span class="font-weight-bold text-2xl">الصيانة</span>
-        <span class="text-sm text-medium-emphasis">سجل صيانة السيارات</span>
+      <div>
+        <div class="d-flex align-center ga-3 mb-1">
+          <v-avatar color="accent" rounded="lg" size="40">
+            <v-icon icon="mdi-car-cog" color="white" size="22" />
+          </v-avatar>
+          <span class="text-2xl font-bold"> الصيانة </span>
+        </div>
+        <span class="text-sm text-medium-emphasis"> سجل صيانة السيارات </span>
       </div>
       <v-btn
         color="accent"

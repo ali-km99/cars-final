@@ -235,7 +235,7 @@ const copyVin = async () => {
         <v-card
           class="rounded-xl2 overflow-hidden relative border border-accent/20 dark:border-white/5 dark:bg-surface-dark group shadow-soft-lg"
         >
-          <div dir="ltr" v-if="galleryImages.length">
+          <div v-if="galleryImages.length">
             <v-carousel
               height="450"
               hide-delimiter-background

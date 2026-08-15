@@ -697,7 +697,7 @@ function handleSubmit() {
 
       <div class="flex gap-2">
         <v-btn
-          v-if="currentTab < 2"
+          v-if="currentTab < 3"
           color="primary"
           rounded="lg"
           @click="currentTab++"
@@ -706,7 +706,7 @@ function handleSubmit() {
         </v-btn>
 
         <v-btn
-          v-if="currentTab === 2"
+          v-if="currentTab === 3"
           type="submit"
           color="success"
           size="large"

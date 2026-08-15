@@ -56,7 +56,7 @@ router.beforeEach((to) => {
 
   // تغيير عنوان الصفحة
   if (to.meta.title) {
-    document.title = `${to.meta.title} | Car Dealer`;
+    document.title = `${to.meta.title} | Motor link`;
   }
 
   return true;

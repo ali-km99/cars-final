@@ -98,11 +98,16 @@ const headers = [
 <template>
   <div>
     <div class="d-flex align-center justify-space-between mb-6">
-      <div class="d-flex flex-column">
-        <span class="font-weight-bold text-2xl">المبيعات</span>
-        <span class="text-sm text-medium-emphasis"
-          >تسجيل وعرض عمليات البيع</span
-        >
+      <div>
+        <div class="d-flex align-center ga-3 mb-1">
+          <v-avatar color="accent" rounded="lg" size="40">
+            <v-icon icon="mdi-cash-register" color="white" size="22" />
+          </v-avatar>
+          <span class="text-2xl font-bold"> المبيعات </span>
+        </div>
+        <span class="text-sm text-medium-emphasis">
+          تسجيل وعرض عمليات البيع
+        </span>
       </div>
       <v-btn
         color="accent"

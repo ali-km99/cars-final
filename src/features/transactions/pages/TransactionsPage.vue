@@ -150,8 +150,8 @@ const headers = [
       class="d-flex flex-wrap justify-space-between align-center ga-4 mb-6 print-hide"
     >
       <div>
-        <h1 class="text-h5 font-weight-bold mb-1">العمليات المالية</h1>
-        <p class="text-body-2 text-medium-emphasis mb-0">
+        <h1 class="text-2xl font-weight-bold mb-1">العمليات المالية</h1>
+        <p class="text-sm text-medium-emphasis mb-0">
           سجل وشاشة تفاصيل كافة الإيرادات والمصروفات الحالية
         </p>
       </div>
@@ -174,7 +174,7 @@ const headers = [
     <div class="print-only mb-6">
       <div class="d-flex justify-space-between align-center border-b pb-4 mb-4">
         <div>
-          <h2 class="text-h5 font-weight-bold">تقرير العمليات المالية</h2>
+          <h2 class="text-xl font-weight-bold">تقرير العمليات المالية</h2>
           <p class="text-caption text-grey">
             تاريخ الاستخراج: {{ formatDate(new Date().toISOString()) }}
           </p>
@@ -332,12 +332,12 @@ const headers = [
       <v-col cols="12" sm="4">
         <v-card class="app-card pa-4" elevation="0" rounded="lg">
           <div class="d-flex justify-space-between align-center">
-            <span class="text-caption text-medium-emphasis">إجمالي الدخل</span>
+            <span class="text-lg text-medium-emphasis">إجمالي الدخل</span>
             <v-avatar color="success" variant="tonal" size="32">
               <v-icon icon="mdi-arrow-bottom-left" size="18" />
             </v-avatar>
           </div>
-          <div class="text-h6 font-weight-bold text-success mt-2">
+          <div class="text-lg font-weight-bold text-success mt-2">
             {{ formatCurrency(totalIncome) }}
           </div>
         </v-card>
@@ -346,14 +346,14 @@ const headers = [
       <v-col cols="12" sm="4">
         <v-card class="app-card pa-4" elevation="0" rounded="lg">
           <div class="d-flex justify-space-between align-center">
-            <span class="text-caption text-medium-emphasis"
+            <span class="text-lg text-medium-emphasis text-nowrap"
               >إجمالي المصروفات</span
             >
             <v-avatar color="error" variant="tonal" size="32">
               <v-icon icon="mdi-arrow-top-right" size="18" />
             </v-avatar>
           </div>
-          <div class="text-h6 font-weight-bold text-error mt-2">
+          <div class="text-lg font-weight-bold text-error mt-2">
             {{ formatCurrency(totalExpense) }}
           </div>
         </v-card>
@@ -362,12 +362,12 @@ const headers = [
       <v-col cols="12" sm="4">
         <v-card class="app-card pa-4" elevation="0" rounded="lg">
           <div class="d-flex justify-space-between align-center">
-            <span class="text-caption text-medium-emphasis">صافي الربح</span>
+            <span class="text-lg text-medium-emphasis">صافي الربح</span>
             <v-avatar color="warning" variant="tonal" size="32">
               <v-icon icon="mdi-scale-balance" size="18" />
             </v-avatar>
           </div>
-          <div class="text-h6 font-weight-bold text-gold mt-2">
+          <div class="text-lg font-weight-bold text-gold mt-2">
             {{ formatCurrency(net) }}
           </div>
         </v-card>
