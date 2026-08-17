@@ -8,8 +8,30 @@ const navItems = [
   { title: "السيارات", icon: "mdi-car-multiple", to: "/cars" },
   { title: "العملاء", icon: "mdi-account-group-outline", to: "/customers" },
   { title: "المبيعات", icon: "mdi-cash-register", to: "/sales" },
-  { title: "الصيانة", icon: "mdi-car-cog", to: "/maintenances" },
-  { title: "المصروفات", icon: "mdi-cash-minus", to: "/expenses" }, // 👈 جديد
+
+  {
+    title: "قسم الصيانة",
+    icon: "mdi-car-cog",
+    children: [
+      {
+        title: "الصيانة",
+        icon: "mdi-wrench-outline",
+        to: "/maintenances",
+      },
+      {
+        title: "مراكز الصيانة",
+        icon: "mdi-garage",
+        to: "/maintenance-centers",
+      },
+      {
+        title: "ديون الصيانة",
+        icon: "mdi-cash-clock",
+        to: "/maintenance-debts",
+      },
+    ],
+  },
+
+  { title: "المصروفات", icon: "mdi-cash-minus", to: "/expenses" },
   { title: "العمليات المالية", icon: "mdi-finance", to: "/transactions" },
   {
     title: "المستخدمين",
@@ -41,16 +63,42 @@ const navItems = [
     <v-divider />
 
     <v-list nav density="comfortable" class="px-2 pt-3">
-      <v-list-item
-        v-for="item in navItems"
-        :key="item.to"
-        :to="item.to"
-        :prepend-icon="item.icon"
-        :title="item.title"
-        rounded="lg"
-        class="mb-1 nav-item"
-        active-class="nav-item-active"
-      />
+      <template v-for="item in navItems" :key="item.title">
+        <!-- العناصر العادية -->
+        <v-list-item
+          v-if="!item.children"
+          :to="item.to"
+          :prepend-icon="item.icon"
+          :title="item.title"
+          rounded="lg"
+          class="mb-1 nav-item"
+          active-class="nav-item-active"
+        />
+
+        <!-- مجموعة الصيانة -->
+        <v-list-group v-else value="maintenance" class="mb-1">
+          <template #activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              :prepend-icon="item.icon"
+              :title="item.title"
+              rounded="lg"
+              class="nav-item"
+            />
+          </template>
+
+          <v-list-item
+            v-for="child in item.children"
+            :key="child.to"
+            :to="child.to"
+            :prepend-icon="child.icon"
+            :title="child.title"
+            rounded="lg"
+            class="maintenance-child"
+            active-class="nav-item-active"
+          />
+        </v-list-group>
+      </template>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -72,5 +120,18 @@ const navItems = [
   background-color: rgba(212, 175, 55, 0.12) !important;
   color: var(--color-accent) !important;
   font-weight: 600;
+}
+.maintenance-child {
+  margin-inline-start: 5px;
+  margin-bottom: 2px;
+  font-size: 0.9rem;
+}
+
+.maintenance-child :deep(.v-list-item__prepend) {
+  margin-inline-end: 10px;
+}
+
+.v-list-group :deep(.v-list-group__items) {
+  padding-inline-start: 0;
 }
 </style>
