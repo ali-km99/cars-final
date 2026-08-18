@@ -25,7 +25,6 @@ const filter = reactive<MaintenanceDebtFilter>({
 });
 
 const statusOptions = [
-  { title: "الكل", value: undefined },
   { title: "غير مدفوع", value: "Unpaid" },
   { title: "مدفوع جزئياً", value: "PartiallyPaid" },
   { title: "مدفوع بالكامل", value: "Paid" },
@@ -37,6 +36,10 @@ const centerOptions = computed(() =>
 
 function applyFilters() {
   debtStore.fetchReport({ ...filter });
+}
+
+function printReport() {
+  window.print();
 }
 
 function resetFilters() {
@@ -94,7 +97,7 @@ const headers = [
     </div>
 
     <!-- الفلاتر -->
-    <v-card class="app-card pa-4 mb-5">
+    <v-card class="app-card pa-4 mb-5 print:hidden">
       <v-row dense>
         <v-col cols="12" sm="6" md="3">
           <v-select
@@ -165,113 +168,125 @@ const headers = [
         >
           تطبيق الفلاتر
         </v-btn>
+        <v-btn
+          color="primary"
+          variant="outlined"
+          size="small"
+          prepend-icon="mdi-printer"
+          style="text-transform: none; font-weight: 600"
+          @click="printReport"
+        >
+          طباعة
+        </v-btn>
       </div>
     </v-card>
 
-    <!-- بطاقات الملخص -->
-    <v-row v-if="debtStore.report" class="mb-5">
-      <v-col cols="6" md="3">
-        <v-card class="app-card pa-4">
-          <span class="text-caption text-medium-emphasis">إجمالي التكلفة</span>
-          <div class="text-h6 font-weight-bold mt-1">
-            {{ formatCurrency(debtStore.report.totalRepairCost) }}
-          </div>
-        </v-card>
-      </v-col>
-      <v-col cols="6" md="3">
-        <v-card class="app-card pa-4">
-          <span class="text-caption text-medium-emphasis">إجمالي المدفوع</span>
-          <div class="text-h6 font-weight-bold text-success mt-1">
-            {{ formatCurrency(debtStore.report.totalPaid) }}
-          </div>
-        </v-card>
-      </v-col>
-      <v-col cols="6" md="3">
-        <v-card class="app-card pa-4">
-          <span class="text-caption text-medium-emphasis">إجمالي الدين</span>
-          <div class="text-h6 font-weight-bold text-error mt-1">
-            {{ formatCurrency(debtStore.report.totalDebt) }}
-          </div>
-        </v-card>
-      </v-col>
-      <v-col cols="6" md="3">
-        <v-card class="app-card pa-4">
-          <span class="text-caption text-medium-emphasis">عدد العمليات</span>
-          <div class="d-flex ga-1 mt-2 flex-wrap">
-            <v-chip size="x-small" color="error" variant="tonal"
-              >{{ debtStore.report.unpaidCount }} غير مدفوع</v-chip
-            >
-            <v-chip size="x-small" color="warning" variant="tonal"
-              >{{ debtStore.report.partiallyPaidCount }} جزئي</v-chip
-            >
-            <v-chip size="x-small" color="success" variant="tonal"
-              >{{ debtStore.report.paidCount }} مدفوع</v-chip
-            >
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
+    <div id="print-report-root">
+      <!-- بطاقات الملخص -->
+      <v-row v-if="debtStore.report" class="mb-5 report-summary-row">
+        <v-col cols="6" md="3">
+          <v-card class="app-card pa-4 report-summary-card">
+            <span class="text-lg text-medium-emphasis">إجمالي التكلفة</span>
+            <div class="text-lg font-weight-bold mt-1">
+              {{ formatCurrency(debtStore.report.totalRepairCost) }}
+            </div>
+          </v-card>
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-card class="app-card pa-4 report-summary-card">
+            <span class="text-lg text-medium-emphasis">إجمالي المدفوع</span>
+            <div class="text-lg font-weight-bold text-success mt-1">
+              {{ formatCurrency(debtStore.report.totalPaid) }}
+            </div>
+          </v-card>
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-card class="app-card pa-4 report-summary-card">
+            <span class="text-lg text-medium-emphasis">إجمالي الدين</span>
+            <div class="text-lg font-weight-bold text-error mt-1">
+              {{ formatCurrency(debtStore.report.totalDebt) }}
+            </div>
+          </v-card>
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-card class="app-card pa-4 report-summary-card">
+            <span class="text-lg text-medium-emphasis">عدد العمليات</span>
+            <div class="d-flex ga-1 mt-2 flex-wrap">
+              <v-chip size="small" color="error" variant="tonal"
+                >{{ debtStore.report.unpaidCount }} غير مدفوع</v-chip
+              >
+              <v-chip size="small" color="warning" variant="tonal"
+                >{{ debtStore.report.partiallyPaidCount }} جزئي</v-chip
+              >
+              <v-chip size="small" color="success" variant="tonal"
+                >{{ debtStore.report.paidCount }} مدفوع</v-chip
+              >
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
 
-    <!-- الجدول -->
-    <v-card class="app-card" no-padding>
-      <v-data-table
-        :headers="headers"
-        :items="debtStore.report?.items || []"
-        :loading="debtStore.loading"
-        item-value="maintenanceId"
-        no-data-text="لا توجد نتائج مطابقة"
-      >
-        <template #item.repairCost="{ item }">{{
-          formatCurrency(item.repairCost)
-        }}</template>
-        <template #item.totalPaid="{ item }">{{
-          formatCurrency(item.totalPaid)
-        }}</template>
-        <template #item.remainingAmount="{ item }">
-          <span class="font-weight-bold text-error">{{
-            formatCurrency(item.remainingAmount)
-          }}</span>
-        </template>
-        <template #item.paymentStatus="{ item }">
-          <v-chip
-            :color="getStatusMeta(item.paymentStatus).color"
-            size="small"
-            variant="tonal"
-          >
-            <v-icon
-              :icon="getStatusMeta(item.paymentStatus).icon"
-              size="14"
-              start
-            />
-            {{ getStatusMeta(item.paymentStatus).label }}
-          </v-chip>
-        </template>
-        <template #item.createdAt="{ item }">{{
-          formatDate(item.createdAt)
-        }}</template>
-        <template #item.actions="{ item }">
-          <div class="d-flex ga-1">
-            <v-btn
-              v-if="item.paymentStatus !== 'Paid'"
-              icon="mdi-cash-plus"
+      <!-- الجدول -->
+      <v-card class="app-card report-table-card" no-padding>
+        <v-data-table
+          :headers="headers"
+          :items="debtStore.report?.items || []"
+          :loading="debtStore.loading"
+          item-value="maintenanceId"
+          no-data-text="لا توجد نتائج مطابقة"
+        >
+          <template #item.repairCost="{ item }">{{
+            formatCurrency(item.repairCost)
+          }}</template>
+          <template #item.totalPaid="{ item }">{{
+            formatCurrency(item.totalPaid)
+          }}</template>
+          <template #item.remainingAmount="{ item }">
+            <span class="font-weight-bold text-error">{{
+              formatCurrency(item.remainingAmount)
+            }}</span>
+          </template>
+          <template #item.paymentStatus="{ item }">
+            <v-chip
+              :color="getStatusMeta(item.paymentStatus).color"
               size="small"
-              variant="text"
-              color="success"
-              title="تسجيل دفعة"
-              @click="openPayment(item)"
-            />
-            <v-btn
-              icon="mdi-eye-outline"
-              size="small"
-              variant="text"
-              color="primary"
-              title="عرض تفاصيل السيارة"
-              @click="goToDetails(item)"
-            />
-          </div>
-        </template>
-      </v-data-table>
-    </v-card>
+              variant="tonal"
+            >
+              <v-icon
+                :icon="getStatusMeta(item.paymentStatus).icon"
+                size="14"
+                start
+              />
+              {{ getStatusMeta(item.paymentStatus).label }}
+            </v-chip>
+          </template>
+          <template #item.createdAt="{ item }">{{
+            formatDate(item.createdAt)
+          }}</template>
+          <template #item.actions="{ item }">
+            <div class="d-flex ga-1 print-actions">
+              <v-btn
+                :disabled="item.paymentStatus == 'Paid'"
+                icon="mdi-cash-plus"
+                size="small"
+                variant="text"
+                color="success"
+                title="تسجيل دفعة"
+                @click="openPayment(item)"
+              />
+              <v-btn
+                icon="mdi-eye-outline"
+                size="small"
+                variant="text"
+                color="primary"
+                title="عرض تفاصيل السيارة"
+                @click="goToDetails(item)"
+              />
+            </div>
+          </template>
+        </v-data-table>
+      </v-card>
+    </div>
 
     <MaintenancePaymentModal
       v-model="paymentModalOpen"
@@ -281,3 +296,76 @@ const headers = [
     />
   </div>
 </template>
+
+<style scoped>
+#print-report-root {
+  width: 100%;
+  position: relative;
+}
+
+@media print {
+  /* 1. Hide Global System Elements (Navbar, Sidebar, Footers, Actions) */
+  :global(nav),
+  :global(aside),
+  :global(.v-navigation-drawer),
+  :global(.v-app-bar),
+  :global(.v-footer),
+  .print-hide,
+  :deep(.v-pagination),
+  :deep(.v-data-table-footer) {
+    display: none !important;
+  }
+
+  /* 2. Show Only Printable Header */
+  .print-only {
+    display: block !important;
+  }
+
+  /* 3. Reset Layout Margins & Padding from Parent Containers */
+  :global(html),
+  :global(body),
+  :global(#app),
+  :global(.v-application),
+  :global(.v-main) {
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* 4. Page Content Spacing Optimization */
+  .transactions-page {
+    padding: 10mm !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  /* 5. Clean Table Formatting for Paper */
+  :deep(.v-table) {
+    background: transparent !important;
+    border: 1px solid #ccc !important;
+    width: 100% !important;
+  }
+
+  :deep(th) {
+    background-color: #f1f3f5 !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    border-bottom: 2px solid #000 !important;
+  }
+
+  :deep(td) {
+    border-bottom: 1px solid #ddd !important;
+    font-size: 12px !important;
+  }
+
+  .app-card {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+}
+</style>

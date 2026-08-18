@@ -15,6 +15,8 @@ const editingCenter = ref<MaintenanceCenter | null>(null);
 const deleteDialog = ref(false);
 const deletingCenter = ref<MaintenanceCenter | null>(null);
 
+const expanded = ref<string[]>([]);
+
 onMounted(() => centerStore.fetchCenters());
 
 function openCreate() {
@@ -47,7 +49,9 @@ function viewDebts(center: MaintenanceCenter) {
 }
 
 const headers = [
+  { title: "", key: "data-table-expand", width: "40px" },
   { title: "اسم المركز", key: "name" },
+  { title: "رقم الهاتف الرئيسي", key: "primaryPhone" },
   { title: "ملاحظات", key: "notes" },
   { title: "إجراءات", key: "actions", sortable: false, align: "end" as const },
 ];
@@ -59,7 +63,7 @@ const headers = [
       <div class="d-flex flex-column">
         <span class="font-weight-bold text-2xl">مراكز الصيانة</span>
         <span class="text-sm text-medium-emphasis"
-          >إدارة مراكز الصيانة المتعامل معها</span
+          >إدارة مراكز الصيانة المتعامل معها وأرقام التواصل</span
         >
       </div>
       <v-btn
@@ -75,14 +79,33 @@ const headers = [
 
     <v-card class="app-card" no-padding>
       <v-data-table
+        v-model:expanded="expanded"
         :headers="headers"
         :items="centerStore.centers"
         :loading="centerStore.loading"
         item-value="id"
+        show-expand
         no-data-text="لا توجد مراكز صيانة حتى الآن"
         loading-text="جاري التحميل..."
       >
+        <template #item.primaryPhone="{ item }">
+          <span v-if="item.phones?.length" class="text-sm" dir="ltr">
+            {{ item.phones[0].phoneNumber }}
+          </span>
+          <span v-else class="text-caption text-medium-emphasis">—</span>
+          <v-chip
+            v-if="item.phones?.length > 1"
+            size="x-small"
+            variant="tonal"
+            color="accent"
+            class="ms-1"
+          >
+            +{{ item.phones.length - 1 }}
+          </v-chip>
+        </template>
+
         <template #item.notes="{ item }">{{ item.notes || "—" }}</template>
+
         <template #item.actions="{ item }">
           <div class="d-flex justify-end gap-1">
             <v-btn
@@ -108,6 +131,29 @@ const headers = [
               @click="confirmDelete(item)"
             />
           </div>
+        </template>
+
+        <!-- صف موسّع: كل أرقام الهاتف -->
+        <template #expanded-row="{ columns, item }">
+          <tr>
+            <td :colspan="columns.length" class="pa-4 bg-surface">
+              <div v-if="item.phones?.length" class="d-flex flex-wrap ga-2">
+                <v-chip
+                  v-for="phone in item.phones"
+                  :key="phone.id"
+                  variant="tonal"
+                  color="secondary"
+                  prepend-icon="mdi-phone"
+                >
+                  <span class="font-weight-bold me-1">{{ phone.label }}:</span>
+                  <span dir="ltr">{{ phone.phoneNumber }}</span>
+                </v-chip>
+              </div>
+              <span v-else class="text-caption text-medium-emphasis">
+                لا توجد أرقام هاتف مسجلة لهذا المركز
+              </span>
+            </td>
+          </tr>
         </template>
       </v-data-table>
     </v-card>

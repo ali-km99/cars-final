@@ -27,6 +27,8 @@ const stats = ref<DashboardStats>({
   totalRevenue: 0,
   totalProfit: 0,
   totalMaintenanceCost: 0,
+  totalMaintenanceDebt: 0,
+  topMaintenanceDebts: [],
   monthlySales: [],
   recentSales: [],
 });
@@ -209,6 +211,13 @@ const financialCards = computed(() => [
     icon: "mdi-wrench-clock",
     color: "warning",
     tooltip: "إجمالي ما أُنفق على صيانة السيارات حتى الآن",
+  },
+  {
+    label: "ديون الصيانة",
+    value: formatCurrency(stats.value.totalMaintenanceDebt),
+    icon: "mdi-cash-clock",
+    color: "error",
+    tooltip: "إجمالي المبالغ المتبقية غير المسددة لمراكز الصيانة",
   },
 ]);
 
@@ -540,7 +549,8 @@ const profitClass = computed(() =>
           v-for="(card, i) in financialCards"
           :key="card.label"
           cols="12"
-          sm="4"
+          sm="6"
+          md="3"
         >
           <v-card
             v-motion
@@ -1018,6 +1028,107 @@ const profitClass = computed(() =>
         </v-table>
       </v-card>
     </template>
+
+    <!-- ══════════════════════════════════════════════════
+     Section — أكبر 5 ديون صيانة
+═══════════════════════════════════════════════════ -->
+    <div
+      v-if="stats.topMaintenanceDebts.length"
+      class="d-flex align-center ga-2 mb-4 mt-6"
+    >
+      <v-icon icon="mdi-cash-clock" color="error" />
+      <span class="text-base font-bold text-nowrap">أكبر ديون الصيانة</span>
+      <v-divider class="flex-grow-1 ms-2" />
+      <v-btn
+        variant="text"
+        color="accent"
+        size="small"
+        prepend-icon="mdi-arrow-left"
+        style="text-transform: none"
+        @click="router.push('/maintenance-debts')"
+      >
+        عرض الكل
+      </v-btn>
+    </div>
+
+    <v-card v-if="stats.topMaintenanceDebts.length" class="app-card pa-0">
+      <v-table density="comfortable">
+        <thead>
+          <tr>
+            <th class="text-body-2 font-weight-bold">
+              <div class="d-flex align-center ga-1">
+                <v-icon icon="mdi-car" size="15" color="accent" /> السيارة
+              </div>
+            </th>
+            <th class="text-body-2 font-weight-bold">
+              <div class="d-flex align-center ga-1">
+                <v-icon icon="mdi-garage" size="15" color="accent" /> المركز
+              </div>
+            </th>
+            <th class="text-body-2 font-weight-bold">
+              <div class="d-flex align-center ga-1">
+                <v-icon icon="mdi-cash" size="15" color="accent" /> التكلفة
+              </div>
+            </th>
+            <th class="text-body-2 font-weight-bold">
+              <div class="d-flex align-center ga-1">
+                <v-icon icon="mdi-cash-remove" size="15" color="error" />
+                المتبقي
+              </div>
+            </th>
+            <th class="text-body-2 font-weight-bold">
+              <div class="d-flex align-center ga-1">
+                <v-icon icon="mdi-calendar" size="15" color="accent" /> التاريخ
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="debtItem in stats.topMaintenanceDebts"
+            :key="debtItem.maintenanceId"
+            class="sale-row"
+          >
+            <td>
+              <div class="d-flex align-center ga-2 py-2">
+                <v-avatar
+                  color="primary"
+                  variant="tonal"
+                  size="32"
+                  rounded="lg"
+                >
+                  <v-icon icon="mdi-car" size="16" />
+                </v-avatar>
+                <span class="text-body-2 font-weight-medium">{{
+                  debtItem.carLabel
+                }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="text-sm">{{ debtItem.maintenanceCenterName }}</span>
+            </td>
+            <td>
+              <span class="text-sm">{{
+                formatCurrency(debtItem.repairCost)
+              }}</span>
+            </td>
+            <td>
+              <v-chip
+                color="error"
+                size="small"
+                variant="tonal"
+                class="font-weight-bold"
+              >
+                {{ formatCurrency(debtItem.remainingAmount) }}
+              </v-chip>
+            </td>
+            <td class="text-caption text-medium-emphasis">
+              {{ formatDate(debtItem.createdAt) }}
+            </td>
+          </tr>
+        </tbody>
+      </v-table>
+    </v-card>
   </div>
 </template>
 

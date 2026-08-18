@@ -267,7 +267,7 @@ const headers = [
         <template #item="{ item, props }">
           <v-list-item v-bind="props" class="px-2">
             <template #prepend>
-              <v-avatar size="42" rounded="lg" class="me-2">
+              <v-avatar size="48" rounded="lg" class="me-2">
                 <v-img
                   v-if="item.raw.imageUrl"
                   :src="resolveImageUrl(item.raw.imageUrl)"
@@ -280,8 +280,14 @@ const headers = [
               <div class="font-weight-medium">{{ item.raw.title }}</div>
             </template>
             <template #subtitle>
-              <div class="text-caption text-medium-emphasis">
-                سعر السيارة: {{ formatCurrency(item.raw.sellingPrice) }}
+              <div class="text-caption text-medium-emphasis d-flex flex-column">
+                <span>الموديل: {{ item.raw.brand }} {{ item.raw.model }}</span>
+                <span
+                  >السنة: {{ item.raw.year }} • الكيلومتر:
+                  {{ item.raw.mileage.toLocaleString() }}
+                  {{ item.raw.mileageUnit }}</span
+                >
+                <span>السعر: {{ formatCurrency(item.raw.sellingPrice) }}</span>
               </div>
             </template>
           </v-list-item>
@@ -289,7 +295,11 @@ const headers = [
         <template #selection="{ item }">
           <div class="d-flex align-center gap-2">
             <v-avatar size="28" rounded="lg">
-              <v-img v-if="item.raw.imageUrl" :src="item.raw.imageUrl" cover />
+              <v-img
+                v-if="item.raw.imageUrl"
+                :src="resolveImageUrl(item.raw.imageUrl)"
+                cover
+              />
               <v-icon v-else icon="mdi-car" size="18" />
             </v-avatar>
             <span>{{ item.raw.title }}</span>
@@ -402,10 +412,50 @@ const headers = [
         >
           <template #item="{ item, props }">
             <v-list-item v-bind="props" class="px-2">
+              <template #prepend>
+                <v-avatar size="46" rounded="lg" class="me-2">
+                  <v-img
+                    v-if="item.raw.imageUrl"
+                    :src="resolveImageUrl(item.raw.imageUrl)"
+                    cover
+                  />
+                  <v-icon v-else icon="mdi-car" color="grey-darken-1" />
+                </v-avatar>
+              </template>
               <template #title>
                 <div class="font-weight-medium">{{ item.raw.title }}</div>
               </template>
+              <template #subtitle>
+                <div
+                  class="text-caption text-medium-emphasis d-flex flex-column"
+                >
+                  <span
+                    >الموديل: {{ item.raw.brand }} {{ item.raw.model }}</span
+                  >
+                  <span
+                    >السنة: {{ item.raw.year }} • الكيلومتر:
+                    {{ item.raw.mileage.toLocaleString() }}
+                    {{ item.raw.mileageUnit }}</span
+                  >
+                  <span
+                    >السعر: {{ formatCurrency(item.raw.sellingPrice) }}</span
+                  >
+                </div>
+              </template>
             </v-list-item>
+          </template>
+          <template #selection="{ item }">
+            <div class="d-flex align-center gap-2">
+              <v-avatar size="26" rounded="lg">
+                <v-img
+                  v-if="item.raw.imageUrl"
+                  :src="resolveImageUrl(item.raw.imageUrl)"
+                  cover
+                />
+                <v-icon v-else icon="mdi-car" size="16" />
+              </v-avatar>
+              <span>{{ item.raw.title }}</span>
+            </div>
           </template>
         </v-autocomplete>
 
