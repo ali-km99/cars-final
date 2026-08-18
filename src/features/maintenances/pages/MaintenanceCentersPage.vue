@@ -142,11 +142,18 @@ const headers = [
                   v-for="phone in item.phones"
                   :key="phone.id"
                   variant="tonal"
-                  color="secondary"
+                  color="primary"
                   prepend-icon="mdi-phone"
                 >
-                  <span class="font-weight-bold me-1">{{ phone.label }}:</span>
-                  <span dir="ltr">{{ phone.phoneNumber }}</span>
+                  <a
+                    :href="'tel:' + phone.phoneNumber"
+                    class="text-decoration-none text-primary"
+                  >
+                    <span class="font-weight-bold me-1"
+                      >{{ phone.label }}:</span
+                    >
+                    <span dir="ltr">{{ phone.phoneNumber }}</span>
+                  </a>
                 </v-chip>
               </div>
               <span v-else class="text-caption text-medium-emphasis">
