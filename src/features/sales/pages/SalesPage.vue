@@ -48,17 +48,19 @@ const carDetailsDialog = ref(false);
 const selectedCarDetail = ref<CarOptionItem | null>(null);
 
 const carOptions = computed<CarOptionItem[]>(() =>
-  carStore.cars.map((c) => ({
-    value: c.id,
-    title: `${c.brand} ${c.model} (${c.year})`,
-    brand: c.brand,
-    model: c.model,
-    year: c.year,
-    sellingPrice: c.sellingPrice,
-    mileage: c.mileage ?? 0,
-    mileageUnit: c.mileageUnit ?? "km",
-    imageUrl: c.primaryImageUrl ?? "",
-  })),
+  carStore.cars
+    .filter((c) => c.statusName !== "Sold")
+    .map((c) => ({
+      value: c.id,
+      title: `${c.brand} ${c.model} (${c.year})`,
+      brand: c.brand,
+      model: c.model,
+      year: c.year,
+      sellingPrice: c.sellingPrice,
+      mileage: c.mileage ?? 0,
+      mileageUnit: c.mileageUnit ?? "km",
+      imageUrl: c.primaryImageUrl ?? "",
+    })),
 );
 const customerOptions = computed(() =>
   customerStore.customers.map((c) => ({ value: c.id, title: c.name })),
